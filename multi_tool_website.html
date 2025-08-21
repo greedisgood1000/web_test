@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多功能工具集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.15);
+        }
+
+        .tool-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #5a67d8;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tool-title::before {
+            content: "🛠️";
+            font-size: 1.2em;
+        }
+
+        .file-upload {
+            width: 100%;
+            padding: 15px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .file-upload:hover {
+            border-color: #5a67d8;
+            background: #edf2f7;
+        }
+
+        .file-upload.dragover {
+            border-color: #5a67d8;
+            background: #e6fffa;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #5a67d8;
+            display: none;
+        }
+
+        .result-area.show {
+            display: block;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #edf2f7;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .file-item .file-name {
+            font-weight: 500;
+        }
+
+        .file-item .file-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .compression-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #5a67d8;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #5a67d8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>多功能工具集</h1>
+            <p>文档转换、文档管理、图片压缩一站式解决方案</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- 文档转换工具 -->
+            <div class="tool-card">
+                <div class="tool-title">文档转换</div>
+                <div class="file-upload" ondrop="handleDrop(event, 'convert')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <input type="file" id="convertFile" accept=".doc,.docx,.pdf,.txt,.md" style="display:none" onchange="handleFileSelect('convert')">
+                    <p>拖拽文件到此处或点击选择文件</p>
+                    <small>支持 DOC, DOCX, PDF, TXT, MD 格式</small>
+                </div>
+                <div class="input-group">
+                    <label>转换格式:</label>
+                    <select id="convertFormat" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <option value="pdf">PDF</option>
+                        <option value="docx">DOCX</option>
+                        <option value="txt">TXT</option>
+                        <option value="md">Markdown</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="convertDocument()">开始转换</button>
+                <div class="loading" id="convertLoading">
+                    <div class="spinner"></div>
+                    <p>正在转换中...</p>
+                </div>
+                <div class="result-area" id="convertResult">
+                    <h4>转换完成</h4>
+                    <p id="convertMessage"></p>
+                    <button class="btn secondary" id="downloadConverted">下载文件</button>
+                </div>
+            </div>
+
+            <!-- 文档管理工具 -->
+            <div class="tool-card">
+                <div class="tool-title">文档管理</div>
+                <div class="file-upload" ondrop="handleDrop(event, 'manage')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <input type="file" id="manageFiles" multiple accept="*/*" style="display:none" onchange="handleFileSelect('manage')">
+                    <p>拖拽文件到此处或点击选择文件</p>
+                    <small>支持批量上传和管理</small>
+                </div>
+                <div class="file-list" id="fileList"></div>
+                <div style="margin-top: 15px;">
+                    <button class="btn" onclick="renameSelected()">重命名</button>
+                    <button class="btn danger" onclick="deleteSelected()">删除</button>
+                    <button class="btn secondary" onclick="moveSelected()">移动</button>
+                    <button class="btn secondary" onclick="copySelected()">复制</button>
+                </div>
+                <div class="result-area" id="manageResult">
+                    <h4>操作完成</h4>
+                    <p id="manageMessage"></p>
+                </div>
+            </div>
+
+            <!-- 图片压缩工具 -->
+            <div class="tool-card">
+                <div class="tool-title">图片压缩</div>
+                <div class="file-upload" ondrop="handleDrop(event, 'compress')" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <input type="file" id="compressFiles" multiple accept="image/*" style="display:none" onchange="handleFileSelect('compress')">
+                    <p>拖拽图片到此处或点击选择图片</p>
+                    <small>支持 JPG, PNG, WebP 等格式</small>
+                </div>
+                <div class="input-group">
+                    <label>压缩质量: <span id="qualityValue">80</span>%</label>
+                    <input type="range" id="quality" min="10" max="100" value="80" onchange="updateQuality(this.value)">
+                </div>
+                <div class="input-group">
+                    <label>输出格式:</label>
+                    <select id="outputFormat" style="width:100%; padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+                        <option value="jpeg">JPEG</option>
+                        <option value="png">PNG</option>
+                        <option value="webp">WebP</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="compressImages()">开始压缩</button>
+                <button class="btn secondary" onclick="downloadAll()">下载全部</button>
+                <div class="progress-bar" id="compressProgress" style="display:none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="compression-stats" id="compressionStats" style="display:none;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="originalSize">0</div>
+                        <div class="stat-label">原始大小</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="compressedSize">0</div>
+                        <div class="stat-label">压缩后大小</div>
+                    </div>
+                </div>
+                <div class="result-area" id="compressResult">
+                    <h4>压缩完成</h4>
+                    <p id="compressMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let managedFiles = [];
+        let compressedImages = [];
+        let selectedFiles = [];
+
+        // 文件拖拽处理
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.currentTarget.classList.remove('dragover');
+        }
+
+        function handleDrop(event, type) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('dragover');
+            
+            const files = Array.from(event.dataTransfer.files);
+            processFiles(files, type);
+        }
+
+        function handleFileSelect(type) {
+            let input;
+            switch(type) {
+                case 'convert':
+                    input = document.getElementById('convertFile');
+                    break;
+                case 'manage':
+                    input = document.getElementById('manageFiles');
+                    break;
+                case 'compress':
+                    input = document.getElementById('compressFiles');
+                    break;
+            }
+            
+            const files = Array.from(input.files);
+            processFiles(files, type);
+        }
+
+        // 点击文件上传区域
+        document.querySelectorAll('.file-upload').forEach(upload => {
+            upload.addEventListener('click', (e) => {
+                if (e.target === upload || e.target.tagName === 'P' || e.target.tagName === 'SMALL') {
+                    const input = upload.querySelector('input[type="file"]');
+                    if (input) input.click();
+                }
+            });
+        });
+
+        function processFiles(files, type) {
+            switch(type) {
+                case 'convert':
+                    if (files.length > 0) {
+                        document.querySelector('.file-upload p').textContent = `已选择: ${files[0].name}`;
+                    }
+                    break;
+                case 'manage':
+                    addToFileList(files);
+                    break;
+                case 'compress':
+                    addToCompressList(files);
+                    break;
+            }
+        }
+
+        // 文档转换功能
+        function convertDocument() {
+            const fileInput = document.getElementById('convertFile');
+            const format = document.getElementById('convertFormat').value;
+            const loading = document.getElementById('convertLoading');
+            const result = document.getElementById('convertResult');
+
+            if (!fileInput.files[0]) {
+                alert('请先选择要转换的文件');
+                return;
+            }
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            // 模拟转换过程
+            setTimeout(() => {
+                loading.classList.remove('show');
+                result.classList.add('show');
+                
+                const fileName = fileInput.files[0].name;
+                const newFileName = fileName.split('.')[0] + '.' + format;
+                
+                document.getElementById('convertMessage').textContent = `文件已成功转换为 ${format.toUpperCase()} 格式`;
+                
+                // 创建下载按钮事件
+                document.getElementById('downloadConverted').onclick = () => {
+                    downloadFile(newFileName, '转换后的文件内容');
+                };
+            }, 2000);
+        }
+
+        // 文档管理功能
+        function addToFileList(files) {
+            const fileList = document.getElementById('fileList');
+            
+            files.forEach(file => {
+                const fileId = Date.now() + Math.random();
+                managedFiles.push({id: fileId, file: file, name: file.name});
+                
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div>
+                        <input type="checkbox" onchange="toggleFileSelection(${fileId}, this.checked)">
+                        <span class="file-name">${file.name}</span>
+                        <small>(${formatFileSize(file.size)})</small>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn" style="padding:5px 10px; margin:0;" onclick="renameFile(${fileId})">重命名</button>
+                        <button class="btn danger" style="padding:5px 10px; margin:0;" onclick="deleteFile(${fileId})">删除</button>
+                    </div>
+                `;
+                
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function toggleFileSelection(fileId, selected) {
+            if (selected) {
+                selectedFiles.push(fileId);
+            } else {
+                selectedFiles = selectedFiles.filter(id => id !== fileId);
+            }
+        }
+
+        function renameFile(fileId) {
+            const file = managedFiles.find(f => f.id === fileId);
+            if (file) {
+                const newName = prompt('请输入新文件名:', file.name);
+                if (newName && newName !== file.name) {
+                    file.name = newName;
+                    updateFileDisplay();
+                    showManageResult(`文件已重命名为: ${newName}`);
+                }
+            }
+        }
+
+        function deleteFile(fileId) {
+            if (confirm('确定要删除这个文件吗？')) {
+                managedFiles = managedFiles.filter(f => f.id !== fileId);
+                updateFileDisplay();
+                showManageResult('文件已删除');
+            }
+        }
+
+        function renameSelected() {
+            if (selectedFiles.length === 0) {
+                alert('请先选择要重命名的文件');
+                return;
+            }
+            
+            const prefix = prompt('请输入新名称前缀:');
+            if (prefix) {
+                selectedFiles.forEach((fileId, index) => {
+                    const file = managedFiles.find(f => f.id === fileId);
+                    if (file) {
+                        const extension = file.name.split('.').pop();
+                        file.name = `${prefix}_${index + 1}.${extension}`;
+                    }
+                });
+                updateFileDisplay();
+                showManageResult(`已重命名 ${selectedFiles.length} 个文件`);
+                selectedFiles = [];
+            }
+        }
+
+        function deleteSelected() {
+            if (selectedFiles.length === 0) {
+                alert('请先选择要删除的文件');
+                return;
+            }
+            
+            if (confirm(`确定要删除选中的 ${selectedFiles.length} 个文件吗？`)) {
+                managedFiles = managedFiles.filter(f => !selectedFiles.includes(f.id));
+                updateFileDisplay();
+                showManageResult(`已删除 ${selectedFiles.length} 个文件`);
+                selectedFiles = [];
+            }
+        }
+
+        function moveSelected() {
+            if (selectedFiles.length === 0) {
+                alert('请先选择要移动的文件');
+                return;
+            }
+            
+            const folder = prompt('请输入目标文件夹名称:');
+            if (folder) {
+                showManageResult(`已将 ${selectedFiles.length} 个文件移动到 ${folder} 文件夹`);
+                selectedFiles = [];
+            }
+        }
+
+        function copySelected() {
+            if (selectedFiles.length === 0) {
+                alert('请先选择要复制的文件');
+                return;
+            }
+            
+            showManageResult(`已复制 ${selectedFiles.length} 个文件`);
+            selectedFiles = [];
+        }
+
+        function updateFileDisplay() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            managedFiles.forEach(fileData => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div>
+                        <input type="checkbox" onchange="toggleFileSelection(${fileData.id}, this.checked)">
+                        <span class="file-name">${fileData.name}</span>
+                        <small>(${formatFileSize(fileData.file.size)})</small>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn" style="padding:5px 10px; margin:0;" onclick="renameFile(${fileData.id})">重命名</button>
+                        <button class="btn danger" style="padding:5px 10px; margin:0;" onclick="deleteFile(${fileData.id})">删除</button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        function showManageResult(message) {
+            document.getElementById('manageMessage').textContent = message;
+            document.getElementById('manageResult').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('manageResult').classList.remove('show');
+            }, 3000);
+        }
+
+        // 图片压缩功能
+        function addToCompressList(files) {
+            const validImages = files.filter(file => file.type.startsWith('image/'));
+            if (validImages.length === 0) {
+                alert('请选择有效的图片文件');
+                return;
+            }
+            
+            document.querySelector('#compressFiles').parentNode.querySelector('p').textContent = 
+                `已选择 ${validImages.length} 个图片文件`;
+        }
+
+        function updateQuality(value) {
+            document.getElementById('qualityValue').textContent = value;
+        }
+
+        function compressImages() {
+            const fileInput = document.getElementById('compressFiles');
+            const quality = document.getElementById('quality').value / 100;
+            const format = document.getElementById('outputFormat').value;
+            const progress = document.getElementById('compressProgress');
+            const progressFill = document.getElementById('progressFill');
+            const stats = document.getElementById('compressionStats');
+            const result = document.getElementById('compressResult');
+
+            if (!fileInput.files.length) {
+                alert('请先选择要压缩的图片');
+                return;
+            }
+
+            progress.style.display = 'block';
+            stats.style.display = 'grid';
+            compressedImages = [];
+            
+            let totalOriginalSize = 0;
+            let totalCompressedSize = 0;
+            let processed = 0;
+            const totalFiles = fileInput.files.length;
+
+            Array.from(fileInput.files).forEach((file, index) => {
+                if (!file.type.startsWith('image/')) return;
+                
+                totalOriginalSize += file.size;
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    canvas.toBlob(function(blob) {
+                        totalCompressedSize += blob.size;
+                        processed++;
+                        
+                        const fileName = file.name.split('.')[0] + '.' + 
+                            (format === 'jpeg' ? 'jpg' : format);
+                        
+                        compressedImages.push({
+                            name: fileName,
+                            blob: blob,
+                            originalSize: file.size,
+                            compressedSize: blob.size
+                        });
+                        
+                        const progressPercent = (processed / totalFiles) * 100;
+                        progressFill.style.width = progressPercent + '%';
+                        
+                        if (processed === totalFiles) {
+                            document.getElementById('originalSize').textContent = formatFileSize(totalOriginalSize);
+                            document.getElementById('compressedSize').textContent = formatFileSize(totalCompressedSize);
+                            
+                            const savedBytes = totalOriginalSize - totalCompressedSize;
+                            const savedPercent = ((savedBytes / totalOriginalSize) * 100).toFixed(1);
+                            
+                            document.getElementById('compressMessage').textContent = 
+                                `压缩完成！节省了 ${formatFileSize(savedBytes)} (${savedPercent}%)`;
+                            result.classList.add('show');
+                        }
+                    }, `image/${format}`, quality);
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function downloadAll() {
+            if (compressedImages.length === 0) {
+                alert('请先压缩图片');
+                return;
+            }
+            
+            compressedImages.forEach(image => {
+                downloadFile(image.name, image.blob);
+            });
+        }
+
+        // 工具函数
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function downloadFile(fileName, content) {
+            const url = content instanceof Blob ? URL.createObjectURL(content) : 
+                'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            if (content instanceof Blob) {
+                URL.revokeObjectURL(url);
+            }
+        }
+    </script>
+</body>
+</html>
